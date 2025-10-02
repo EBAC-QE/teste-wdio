@@ -1,41 +1,53 @@
-import { $ } from '@wdio/globals'
-import Page from './page.js';
-
-/**
- * sub page containing specific selectors and methods for a specific page
- */
-class LoginPage extends Page {
-    /**
-     * define selectors using getter methods
-     */
-    get inputUsername () {
-        return $('#username');
+class LoginPage {
+    //Seletores
+    get menuLogin() {
+        return $('~Login')
+    }
+    get campoEmail() {
+        return $('~input-email')
+    }
+    get campoSenha() {
+        return $('~input-password')
+    }
+    get botaoLogin() {
+        return $('~button-LOGIN')
+    }
+    get mensagem() {
+        return $('id=android:id/message')
     }
 
-    get inputPassword () {
-        return $('#password');
+    //Métodos / Ações 
+
+    async abrirMenu() {
+        await this.menuLogin.click()
     }
 
-    get btnSubmit () {
-        return $('button[type="submit"]');
+    async preencherLogin(email, senha) { 
+        await this.campoEmail.clearValue()
+        await this.campoEmail.setValue(email)
+        await this.campoSenha.clearValue()
+        await this.campoSenha.setValue(senha)
+        await this.botaoLogin.click()
     }
 
-    /**
-     * a method to encapsule automation code to interact with the page
-     * e.g. to login using username and password
-     */
-    async login (username, password) {
-        await this.inputUsername.setValue(username);
-        await this.inputPassword.setValue(password);
-        await this.btnSubmit.click();
+    async mensagemAlerta() {
+        return await this.mensagem.getText()
     }
 
-    /**
-     * overwrite specific options to adapt it to page object
-     */
-    open () {
-        return super.open('login');
+    async mensagemErro(texto) {
+        const elemento = $(`//android.widget.TextView[@text="${texto}"]`)
+        await expect(elemento).toHaveText(texto)
     }
+
+    async reiniciarApp() {
+        const packageName = await driver.getCurrentPackage()
+        await driver.terminateApp(packageName)
+        await driver.activateApp(packageName)
+    }
+
 }
 
-export default new LoginPage();
+export default new LoginPage()
+
+
+
